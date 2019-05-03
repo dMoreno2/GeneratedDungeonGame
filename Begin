@@ -1,1 +1,256 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace DungeonCrawller
+{
+    class Program
+    {
+        ///Dungeon Generation Size And Area Controlls///
+        /**/public static int Matrixheight = 62;
+        /**/public static int Matrixwidth = 62;
+        ///**/public static int NumberOfPoints = 3000;
+        public static double thingy = (Matrixheight * Matrixwidth) * 1.9 - (Matrixheight * Matrixwidth);
+        /**/
+        public static int NumberOfPoints = Convert.ToInt32(thingy);
+        /**/
+        public static int Loops = 15;
+        ////////////////////////////////////////////////
+
+
+        public static int maxRandomUpper = Matrixwidth;
+        public static int upperMedian = maxRandomUpper - maxRandomLower;
+        public static int medianRandom = maxRandomUpper / 2;
+        public static int maxRandomLower = maxRandomUpper/4;
+        public static int ConsolePrintWidth = Matrixwidth;
+        public static int maxArraySize = NumberOfPoints -1;
+        public static int lowestRandomValue = maxRandomUpper - Matrixwidth + 1;
+        public static List<KeyValuePair<int, int>> Walls = new List<KeyValuePair<int, int>>();
+        public static char[,] Matrix = new char[Matrixwidth, Matrixheight];
+        public static int LargestWindowHeight { get; }
+
+
+
+
+        static void Main(string[] args)
+        {
+
+            bool done = false;
+            while (done == false)
+            {
+                MapMaker();    
+                Console.WriteLine("Type Restart to regenerate the scene or end to end the scene");
+                string input = Console.ReadLine();
+                if (input == "Restart")
+                {
+                    done = false;
+                    MapMaker();
+                }
+                if (input == "restart")
+                {
+                    done = false;
+                    MapMaker();
+                }
+                if (input == "end")
+                {
+                    Console.WriteLine("Press Enter Key To End");
+                    ConsoleKeyInfo keyInfo = Console.ReadKey(true);
+                    if (keyInfo.Key == ConsoleKey.Enter)
+                    {
+                        Console.ReadKey();
+                        done = true;                        
+                    }
+                }
+            }
+            
+        }
+
+
+        static void MapMaker()
+        {
+            int x = 0;
+
+            //beinging of loop2 varible
+            //start of code
+            while (x < Loops)
+            {
+                int[] numbersX = new int[NumberOfPoints];
+                int[] numbersY = new int[NumberOfPoints];
+
+                Random random = new Random();
+                int previousInt = random.Next(lowestRandomValue, medianRandom);
+                int i = 0;
+
+                //generates random numbers from 1, to maxrandomlower and adds to numbers x.
+
+                while (numbersX[maxArraySize] == 0)
+                {
+                    int randomInt = random.Next(lowestRandomValue, maxRandomUpper);
+                    if (randomInt == previousInt + 1 || randomInt == previousInt - 1 || randomInt == previousInt || previousInt == randomInt)
+                    {
+                        if (i == maxArraySize/4)
+                        {
+                            previousInt = random.Next(lowestRandomValue, maxRandomUpper);
+                        }
+                        numbersX[i] = randomInt;
+                        previousInt = randomInt;
+                        i++;
+                    }
+                    if (numbersX[maxArraySize] != 0)
+                    {
+                        break;
+                    }
+                }
+
+                i = 0;           
+
+                previousInt = random.Next(lowestRandomValue, medianRandom);
+
+                 while (numbersY[maxArraySize/2] == 0)
+                {
+                    int randomInt = random.Next(1, maxRandomUpper);
+                    if (randomInt == previousInt + 1 || randomInt == previousInt - 1 || randomInt == previousInt || previousInt == randomInt)
+                    {
+                        if (i == maxArraySize / 4)
+                        {
+                            previousInt = random.Next(medianRandom, upperMedian);
+                        }
+                        numbersY[i] = randomInt;
+                        previousInt = randomInt;
+                        i++;
+                    }
+                    if (numbersY[maxArraySize] != 0)
+                    {
+                        break;
+                    }
+                }
+                for (int R = 0; R < numbersY.Length; R++)
+                {
+                    Walls.Add(new KeyValuePair<int, int>((numbersX[R]), (numbersY[R])));
+                }
+
+                for (int f = 0; f < numbersX.Length; f++)
+                {
+                    numbersX[f] = 0;
+                    numbersY[f] = 0;
+                }
+
+                /*foreach value in walls, if a key value appears more than twice. delete, get new keyvaluepair */
+
+                i = 0;
+
+                previousInt = random.Next(medianRandom, upperMedian);
+                while (numbersX[maxArraySize] == 0)
+                {
+                    int randomInt = random.Next(medianRandom, upperMedian);
+                    if (randomInt == previousInt + 1 || randomInt == previousInt - 1 || randomInt == previousInt || previousInt == randomInt)
+                    {
+                        if (i == maxArraySize / 2)
+                        {
+                            previousInt = random.Next(upperMedian, maxRandomUpper);
+                        }
+                        numbersX[i] = randomInt;
+                        previousInt = randomInt;
+                        i++;
+                    }
+                    if (numbersX[maxArraySize] != 0)
+                    {
+                        break;
+                    }
+                }
+
+                i = 0;
+                           
+                previousInt = random.Next(medianRandom, upperMedian);
+
+                while (numbersY[maxArraySize] == 0)
+                {
+                    int randomInt = random.Next(medianRandom, upperMedian);
+                    if (randomInt == previousInt + 1 || randomInt == previousInt - 1 || randomInt == previousInt || previousInt == randomInt)
+                    {
+                        if (i == maxArraySize / 2)
+                        {
+                            previousInt = random.Next(upperMedian, maxRandomUpper);
+                        }
+                        numbersY[i] = randomInt;
+                        previousInt = randomInt;
+                        i++;
+                    }
+                    if (numbersY[maxArraySize] != 0)
+                    {
+                        break;
+                    }
+                }
+                for (int R = 0; R < numbersY.Length; R++)
+                {                    
+                    Walls.Add(new KeyValuePair<int, int>((numbersX[R]), (numbersY[R])));
+                }
+                for (int a = 0; a < Matrixwidth; a++)
+                {
+                    for (int b = 0; b < Matrixheight; b++)
+                    {
+                        Matrix[a, b] = ' ';
+                    }
+                }
+                for (int R = 0; R < numbersY.Length; R++)
+                {
+                    Matrix[Walls[R].Key, Walls[R].Value] = '\u2588';
+                }
+                for (int a = 0; a < Matrixwidth; a++)
+                {
+                    Matrix[a, 0] = '\u2588';
+                }
+                for (int b = 0; b < Matrixheight; b++)
+                {
+                    Matrix[0, b] = '\u2588';
+                }
+
+                for (int a = 0; a < Matrixwidth; a++)
+                {
+                    Matrix[a, Matrixheight - 1] = '\u2588';
+                }
+
+                for (int b = 0; b < Matrixheight; b++)
+                {
+                    Matrix[Matrixheight - 1, b] = '\u2588';
+                }
+               
+                Matrix[61,0] = '\u2588';
+                Matrix[0, 61] = '\u2588';
+
+                x++;
+            }
+            Printer(Matrix);
+        }
+        
+        public static void Printer(char[,] Matrix)
+        {
+            var largeWindHeight = Console.LargestWindowHeight;
+            Console.SetWindowSize(70, Console.LargestWindowHeight-20);
+            Console.OutputEncoding = System.Text.Encoding.Unicode;
+            Console.Clear();
+            int lineWidth = -1;
+
+            for (int a = 0; a < Matrixwidth; a++)
+            {
+                for (int b = 0; b < Matrixheight; b++)
+                {                  
+                    if (lineWidth == ConsolePrintWidth)
+                    {
+                        Console.WriteLine();
+                        lineWidth = 0;
+                        Console.Write('\u2588');
+                        Console.Write(Matrix[a, b]);
+                    }
+                    Console.Write(Matrix[a, b]);        // prints matrix with lines beside each space
+                    lineWidth++;
+                }              
+            }
+            Console.Write(Matrix[61, 61]);
+            Console.WriteLine();
+        }
+    }
+}
 
