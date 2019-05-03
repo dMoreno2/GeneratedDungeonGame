@@ -13,10 +13,8 @@ namespace DungeonCrawller
         /**/public static int Matrixwidth = 62;
         ///**/public static int NumberOfPoints = 3000;
         public static double thingy = (Matrixheight * Matrixwidth) * 1.9 - (Matrixheight * Matrixwidth);
-        /**/
-        public static int NumberOfPoints = Convert.ToInt32(thingy);
-        /**/
-        public static int Loops = 15;
+        /**/public static int NumberOfPoints = Convert.ToInt32(thingy);
+        /**/public static int Loops = 15;
         ////////////////////////////////////////////////
 
 
@@ -36,7 +34,7 @@ namespace DungeonCrawller
 
         static void Main(string[] args)
         {
-
+            start:
             bool done = false;
             while (done == false)
             {
@@ -46,12 +44,16 @@ namespace DungeonCrawller
                 if (input == "Restart")
                 {
                     done = false;
-                    MapMaker();
+                    //MapMaker();
+                    Walls.Clear();
+                    goto start;
                 }
                 if (input == "restart")
                 {
                     done = false;
-                    MapMaker();
+                    //MapMaker();
+                    Walls.Clear();
+                    goto start;
                 }
                 if (input == "end")
                 {
@@ -216,7 +218,55 @@ namespace DungeonCrawller
                 {
                     Matrix[Matrixheight - 1, b] = '\u2588';
                 }
-               
+                for(int R = 1; R < numbersY.Length; R++)
+                {
+                    for(int t = 2; t < numbersY.Length; t++)
+                    {
+                        if(Matrix[Walls[R].Key ,Walls[t].Value] == '\u2588')
+                        {
+                            if(Matrix[Walls[R].Key ,Walls[t - 1].Value] == '\u2588' && Matrix[Walls[R].Key ,Walls[t + 1].Value] == '\u2588')
+                            {
+                                Matrix[Walls[R].Key ,Walls[t].Value] = '\u2588';
+                            }
+                            if(Matrix[Walls[t -2].Key ,Walls[R].Value] == '\u2588' && Matrix[Walls[t =2].Key ,Walls[R].Value] == '\u2588')
+                            {
+                                Matrix[Walls[R].Key ,Walls[t].Value] = '\u2588';
+                            }
+                            if(Matrix[Walls[t - 1].Key ,Walls[R].Value] == '\u2588' && Matrix[Walls[t + 1].Key ,Walls[R].Value] != '\u2588' && Matrix[Walls[t + 2].Key ,Walls[R].Value] == '\u2588')
+                            {
+                                Matrix[Walls[t+1].Key ,Walls[R].Value] = '\u2588';
+                            }
+                            if(Matrix[Walls[R].Key ,Walls[t - 2].Value] != '\u2588' && Matrix[Walls[R].Key ,Walls[t + 2].Value] != '\u2588')
+                            {
+                            Matrix[Walls[R].Key ,Walls[t].Value] = ' ';
+                            }
+                            else
+                            {
+                                Matrix[Walls[R].Key ,Walls[t].Value] = ' ';
+                            }
+                            //if(Matrix[Walls[t - 1].Key ,Walls[R].Value] == '\u2588' && Matrix[Walls[t + 1].Key ,Walls[R].Value] == '\u2588' && Matrix[Walls[R].Key ,Walls[t - 1].Value] == '\u2588' && Matrix[Walls[R].Key ,Walls[t + 1].Value] == '\u2588')
+                            //{
+                            //    Matrix[Walls[R - 1].Key ,Walls[t - 1].Value] = '\u2588';
+                            //    Matrix[Walls[R - 1].Key ,Walls[t + 1].Value] = '\u2588';
+                            //    Matrix[Walls[R + 1].Key ,Walls[t + 1].Value] = '\u2588';
+                            //    Matrix[Walls[R + 1].Key ,Walls[t - 1].Value] = '\u2588';
+                            //}
+                            
+                        }
+                        //if(Matrix[Walls[t].Key ,Walls[R].Value] == ' ')
+                        //{
+                        //    if(Matrix[Walls[t-1].Key ,Walls[R].Value] == ' ' && Matrix[Walls[t + 1].Key ,Walls[R].Value] == ' ' && Matrix[Walls[R].Key ,Walls[t - 1].Value] == ' ' && Matrix[Walls[R].Key ,Walls[t + 1].Value] == ' ')
+                        //    {
+                        //        Matrix[Walls[R - 1].Key ,Walls[t - 1].Value] = ' ';
+                        //        Matrix[Walls[R - 1].Key ,Walls[t + 1].Value] = ' ';
+                        //        Matrix[Walls[R + 1].Key ,Walls[t + 1].Value] = ' ';
+                        //        Matrix[Walls[R + 1].Key ,Walls[t - 1].Value] = ' ';
+                        //    }
+                        //}
+                                
+                    }
+                }
+
                 Matrix[61,0] = '\u2588';
                 Matrix[0, 61] = '\u2588';
 
@@ -253,4 +303,3 @@ namespace DungeonCrawller
         }
     }
 }
-
