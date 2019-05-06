@@ -3,57 +3,92 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Runtime.InteropServices;
 
 namespace DungeonCrawller
 {
+    class Character
+    {
+        public int speed;
+        public int charisma;
+        public int damage;
+        public string name;
+        public int health;
+    }
     class Program
     {
         ///Dungeon Generation Size And Area Controlls///
         /**/public static int Matrixheight = 62;
         /**/public static int Matrixwidth = 62;
         ///**/public static int NumberOfPoints = 3000;
-        public static double thingy = (Matrixheight * Matrixwidth) * 1.9 - (Matrixheight * Matrixwidth);
-        /**/public static int NumberOfPoints = Convert.ToInt32(thingy);
-        /**/public static int Loops = 15;
+        /**/public static double generatedPoints = (Matrixheight * Matrixwidth) * 1.5 - (Matrixheight * Matrixwidth);
+        /**/public static int NumberOfPoints = Convert.ToInt32(generatedPoints);
+        /**/public static int Loops = 3;
+        /**/public static int cleaner = 20;
         ////////////////////////////////////////////////
 
 
-        public static int maxRandomUpper = Matrixwidth;
-        public static int upperMedian = maxRandomUpper - maxRandomLower;
-        public static int medianRandom = maxRandomUpper / 2;
-        public static int maxRandomLower = maxRandomUpper/4;
+        public static int MaxRandom = Matrixwidth -1;
+        public static int upperMedian = MaxRandom - secondRandomRange;
+        public static int medianRandom = MaxRandom / 2;
+        public static int secondRandomRange = MaxRandom / 4;
         public static int ConsolePrintWidth = Matrixwidth;
-        public static int maxArraySize = NumberOfPoints -1;
-        public static int lowestRandomValue = maxRandomUpper - Matrixwidth + 1;
+        public static int maxArraySize = NumberOfPoints - 1;
+        public static int lowestRandomValue = MaxRandom - Matrixwidth + 1;
         public static List<KeyValuePair<int, int>> Walls = new List<KeyValuePair<int, int>>();
         public static char[,] Matrix = new char[Matrixwidth, Matrixheight];
         public static int LargestWindowHeight { get; }
+        public static int[] numbersX = new int[NumberOfPoints];
+        public static int[] numbersY = new int[NumberOfPoints];
+        public static bool Cleaning = true;
+
+        public static int Character;
 
 
 
 
         static void Main(string[] args)
         {
-            start:
+           
+        start:
             bool done = false;
             while (done == false)
             {
-                MapMaker();    
-                Console.WriteLine("Type Restart to regenerate the scene or end to end the scene");
+                CharacterSelection();
+                for (int Test = 0; Test < 5; Test++)
+                {
+                    MapMaker();                    
+                }
+
+                ReClean:
+                for (int x = 0; x < cleaner; x++)
+                {
+                    Cleaner(Matrix);
+                    x++;
+                }
+                Console.Clear();
+                Console.WriteLine("RULES");
+
+                Printer(Matrix);
+                             
+
+                Console.WriteLine("Type Restart to Restart the scene or end to end");
                 string input = Console.ReadLine();
                 if (input == "Restart")
                 {
                     done = false;
-                    //MapMaker();
                     Walls.Clear();
                     goto start;
                 }
                 if (input == "restart")
                 {
                     done = false;
-                    //MapMaker();
                     Walls.Clear();
                     goto start;
+                }
+                if (input == "clean")
+                {
+                    goto ReClean;
                 }
                 if (input == "end")
                 {
@@ -62,11 +97,11 @@ namespace DungeonCrawller
                     if (keyInfo.Key == ConsoleKey.Enter)
                     {
                         Console.ReadKey();
-                        done = true;                        
+                        done = true;
                     }
                 }
             }
-            
+
         }
 
 
@@ -74,84 +109,23 @@ namespace DungeonCrawller
         {
             int x = 0;
 
-            //beinging of loop2 varible
-            //start of code
             while (x < Loops)
             {
                 int[] numbersX = new int[NumberOfPoints];
                 int[] numbersY = new int[NumberOfPoints];
 
                 Random random = new Random();
-                int previousInt = random.Next(lowestRandomValue, medianRandom);
+
+                int previousInt = random.Next(lowestRandomValue, MaxRandom);
                 int i = 0;
-
-                //generates random numbers from 1, to maxrandomlower and adds to numbers x.
-
-                while (numbersX[maxArraySize] == 0)
+                while (numbersX[maxArraySize -1] == 0)
                 {
-                    int randomInt = random.Next(lowestRandomValue, maxRandomUpper);
-                    if (randomInt == previousInt + 1 || randomInt == previousInt - 1 || randomInt == previousInt || previousInt == randomInt)
-                    {
-                        if (i == maxArraySize/4)
-                        {
-                            previousInt = random.Next(lowestRandomValue, maxRandomUpper);
-                        }
-                        numbersX[i] = randomInt;
-                        previousInt = randomInt;
-                        i++;
-                    }
-                    if (numbersX[maxArraySize] != 0)
-                    {
-                        break;
-                    }
-                }
-
-                i = 0;           
-
-                previousInt = random.Next(lowestRandomValue, medianRandom);
-
-                 while (numbersY[maxArraySize/2] == 0)
-                {
-                    int randomInt = random.Next(1, maxRandomUpper);
+                    int randomInt = random.Next(lowestRandomValue, MaxRandom);
                     if (randomInt == previousInt + 1 || randomInt == previousInt - 1 || randomInt == previousInt || previousInt == randomInt)
                     {
                         if (i == maxArraySize / 4)
                         {
-                            previousInt = random.Next(medianRandom, upperMedian);
-                        }
-                        numbersY[i] = randomInt;
-                        previousInt = randomInt;
-                        i++;
-                    }
-                    if (numbersY[maxArraySize] != 0)
-                    {
-                        break;
-                    }
-                }
-                for (int R = 0; R < numbersY.Length; R++)
-                {
-                    Walls.Add(new KeyValuePair<int, int>((numbersX[R]), (numbersY[R])));
-                }
-
-                for (int f = 0; f < numbersX.Length; f++)
-                {
-                    numbersX[f] = 0;
-                    numbersY[f] = 0;
-                }
-
-                /*foreach value in walls, if a key value appears more than twice. delete, get new keyvaluepair */
-
-                i = 0;
-
-                previousInt = random.Next(medianRandom, upperMedian);
-                while (numbersX[maxArraySize] == 0)
-                {
-                    int randomInt = random.Next(medianRandom, upperMedian);
-                    if (randomInt == previousInt + 1 || randomInt == previousInt - 1 || randomInt == previousInt || previousInt == randomInt)
-                    {
-                        if (i == maxArraySize / 2)
-                        {
-                            previousInt = random.Next(upperMedian, maxRandomUpper);
+                            previousInt = random.Next(lowestRandomValue, MaxRandom);
                         }
                         numbersX[i] = randomInt;
                         previousInt = randomInt;
@@ -164,17 +138,17 @@ namespace DungeonCrawller
                 }
 
                 i = 0;
-                           
-                previousInt = random.Next(medianRandom, upperMedian);
 
-                while (numbersY[maxArraySize] == 0)
+                previousInt = random.Next(lowestRandomValue, MaxRandom);
+
+                while (numbersY[maxArraySize - 1] == 0)
                 {
-                    int randomInt = random.Next(medianRandom, upperMedian);
+                    int randomInt = random.Next(1, MaxRandom);
                     if (randomInt == previousInt + 1 || randomInt == previousInt - 1 || randomInt == previousInt || previousInt == randomInt)
                     {
-                        if (i == maxArraySize / 2)
+                        if (i == maxArraySize / 4)
                         {
-                            previousInt = random.Next(upperMedian, maxRandomUpper);
+                            previousInt = random.Next(lowestRandomValue, MaxRandom);
                         }
                         numbersY[i] = randomInt;
                         previousInt = randomInt;
@@ -186,99 +160,55 @@ namespace DungeonCrawller
                     }
                 }
                 for (int R = 0; R < numbersY.Length; R++)
-                {                    
+                {
                     Walls.Add(new KeyValuePair<int, int>((numbersX[R]), (numbersY[R])));
                 }
-                for (int a = 0; a < Matrixwidth; a++)
-                {
-                    for (int b = 0; b < Matrixheight; b++)
-                    {
-                        Matrix[a, b] = ' ';
-                    }
-                }
-                for (int R = 0; R < numbersY.Length; R++)
-                {
-                    Matrix[Walls[R].Key, Walls[R].Value] = '\u2588';
-                }
-                for (int a = 0; a < Matrixwidth; a++)
-                {
-                    Matrix[a, 0] = '\u2588';
-                }
-                for (int b = 0; b < Matrixheight; b++)
-                {
-                    Matrix[0, b] = '\u2588';
-                }
-
-                for (int a = 0; a < Matrixwidth; a++)
-                {
-                    Matrix[a, Matrixheight - 1] = '\u2588';
-                }
-
-                for (int b = 0; b < Matrixheight; b++)
-                {
-                    Matrix[Matrixheight - 1, b] = '\u2588';
-                }
-                for(int R = 1; R < numbersY.Length; R++)
-                {
-                    for(int t = 2; t < numbersY.Length; t++)
-                    {
-                        if(Matrix[Walls[R].Key ,Walls[t].Value] == '\u2588')
-                        {
-                            if(Matrix[Walls[R].Key ,Walls[t - 1].Value] == '\u2588' && Matrix[Walls[R].Key ,Walls[t + 1].Value] == '\u2588')
-                            {
-                                Matrix[Walls[R].Key ,Walls[t].Value] = '\u2588';
-                            }
-                            if(Matrix[Walls[t -2].Key ,Walls[R].Value] == '\u2588' && Matrix[Walls[t =2].Key ,Walls[R].Value] == '\u2588')
-                            {
-                                Matrix[Walls[R].Key ,Walls[t].Value] = '\u2588';
-                            }
-                            if(Matrix[Walls[t - 1].Key ,Walls[R].Value] == '\u2588' && Matrix[Walls[t + 1].Key ,Walls[R].Value] != '\u2588' && Matrix[Walls[t + 2].Key ,Walls[R].Value] == '\u2588')
-                            {
-                                Matrix[Walls[t+1].Key ,Walls[R].Value] = '\u2588';
-                            }
-                            if(Matrix[Walls[R].Key ,Walls[t - 2].Value] != '\u2588' && Matrix[Walls[R].Key ,Walls[t + 2].Value] != '\u2588')
-                            {
-                            Matrix[Walls[R].Key ,Walls[t].Value] = ' ';
-                            }
-                            else
-                            {
-                                Matrix[Walls[R].Key ,Walls[t].Value] = ' ';
-                            }
-                            //if(Matrix[Walls[t - 1].Key ,Walls[R].Value] == '\u2588' && Matrix[Walls[t + 1].Key ,Walls[R].Value] == '\u2588' && Matrix[Walls[R].Key ,Walls[t - 1].Value] == '\u2588' && Matrix[Walls[R].Key ,Walls[t + 1].Value] == '\u2588')
-                            //{
-                            //    Matrix[Walls[R - 1].Key ,Walls[t - 1].Value] = '\u2588';
-                            //    Matrix[Walls[R - 1].Key ,Walls[t + 1].Value] = '\u2588';
-                            //    Matrix[Walls[R + 1].Key ,Walls[t + 1].Value] = '\u2588';
-                            //    Matrix[Walls[R + 1].Key ,Walls[t - 1].Value] = '\u2588';
-                            //}
-                            
-                        }
-                        //if(Matrix[Walls[t].Key ,Walls[R].Value] == ' ')
-                        //{
-                        //    if(Matrix[Walls[t-1].Key ,Walls[R].Value] == ' ' && Matrix[Walls[t + 1].Key ,Walls[R].Value] == ' ' && Matrix[Walls[R].Key ,Walls[t - 1].Value] == ' ' && Matrix[Walls[R].Key ,Walls[t + 1].Value] == ' ')
-                        //    {
-                        //        Matrix[Walls[R - 1].Key ,Walls[t - 1].Value] = ' ';
-                        //        Matrix[Walls[R - 1].Key ,Walls[t + 1].Value] = ' ';
-                        //        Matrix[Walls[R + 1].Key ,Walls[t + 1].Value] = ' ';
-                        //        Matrix[Walls[R + 1].Key ,Walls[t - 1].Value] = ' ';
-                        //    }
-                        //}
-                                
-                    }
-                }
-
-                Matrix[61,0] = '\u2588';
-                Matrix[0, 61] = '\u2588';
-
+                
                 x++;
             }
-            Printer(Matrix);
+
+
+
+            for (int a = 0; a < Matrixwidth; a++)
+            {
+                for (int b = 0; b < Matrixheight; b++)
+                {
+                    Matrix[a, b] = ' ';
+                }
+            }
+            for (int R = 0; R < Walls.Count; R++)
+            {
+                Matrix[Walls[R].Key, Walls[R].Value] = '\u2588';
+            }
+
+            for (int a = 0; a < Matrixwidth; a++)
+            {
+                Matrix[a, 0] = '\u2588';
+            }
+            for (int b = 0; b < Matrixheight; b++)
+            {
+                Matrix[0, b] = '\u2588';
+            }
+            for (int a = 0; a < Matrixwidth; a++)
+            {
+                Matrix[a, Matrixheight - 1] = '\u2588';
+            }
+            for (int b = 0; b < Matrixheight; b++)
+            {
+                Matrix[Matrixheight - 1, b] = '\u2588';
+            }
+            Console.Clear();
+            Matrix[61, 0] = '\u2588';
+            Matrix[0, 61] = '\u2588';
+
+            
+           // Printer(Matrix);
         }
-        
-        public static void Printer(char[,] Matrix)
+
+        static void Printer(char[,] Matrix)
         {
             var largeWindHeight = Console.LargestWindowHeight;
-            Console.SetWindowSize(70, Console.LargestWindowHeight-20);
+            Console.SetWindowSize(70, Console.LargestWindowHeight);
             Console.OutputEncoding = System.Text.Encoding.Unicode;
             Console.Clear();
             int lineWidth = -1;
@@ -286,7 +216,7 @@ namespace DungeonCrawller
             for (int a = 0; a < Matrixwidth; a++)
             {
                 for (int b = 0; b < Matrixheight; b++)
-                {                  
+                {
                     if (lineWidth == ConsolePrintWidth)
                     {
                         Console.WriteLine();
@@ -296,10 +226,137 @@ namespace DungeonCrawller
                     }
                     Console.Write(Matrix[a, b]);        // prints matrix with lines beside each space
                     lineWidth++;
-                }              
+                }
             }
-            Console.Write(Matrix[61, 61]);
+            Console.Write(Matrix[61, 61]);  
             Console.WriteLine();
+        }
+
+        static void Cleaner(char[,] Matrix)
+        {
+            int ReRun = 0;
+            Console.WriteLine("Please Wait While Game Is Loading");
+            while (ReRun < cleaner)
+            {
+
+                for (int a = 0; a < Matrixheight; a++)
+                {
+                    for (int b = 2; b < Matrixheight; b++)
+                    {
+                        if (Matrix[a, b] == ' ')
+                        {
+                            
+                            if (Matrix[a, b] != '\u2588' && Matrix[a, b + 1] == '\u2588' && Matrix[a, b - 1] == '\u2588')
+                            {
+                                Matrix[a, b] = '\u2588';
+                            }
+                            if (b + 2 < Matrixheight)
+                            {
+                                if (Matrix[a, b - 1] == '\u2588' && Matrix[a, b + 1] == '\u2588' && Matrix[a, b - 2] == '\u2588' && Matrix[a, b + 2] == '\u2588')
+                                {
+                                    Matrix[a, b] = '\u2588';
+                                }
+                                if (Matrix[b, a] != '\u2588' && Matrix[b - 1, a] == '\u2588' && Matrix[b - 2, a] == '\u2588' && Matrix[b + 1, a] == '\u2588' && Matrix[b + 2, a] == '\u2588')
+                                {
+                                    Matrix[b, a] = '\u2588';
+                                }
+                                if (b + 3 < Matrixheight)
+                                {
+                                    if (Matrix[a, b - 1] == '\u2588' && Matrix[a, b + 1] == '\u2588' && Matrix[a, b + 3] == '\u2588' && Matrix[a, b + 2] == '\u2588')
+                                    {
+                                        Matrix[a, b] = '\u2588';
+                                    }
+                                    if (Matrix[a, b - 1] == '\u2588' && Matrix[a, b + 1] == '\u2588' && Matrix[a, b + 2] != '\u2588' && Matrix[a, b + 3] == '\u2588')
+                                    {
+                                        Matrix[a, b] = '\u2588';
+                                    }
+                                }
+                                if (Matrix[b - 1, a] != '\u2588' && Matrix[b - 2, a] != '\u2588' && Matrix[b + 1, a] == '\u2588' && Matrix[b + 2, a] == '\u2588')
+                                {
+                                    Matrix[a, b] = ' ';
+                                }
+                                if (Matrix[a, b - 1] == '\u2588' && Matrix[a, b + 1] == '\u2588' && Matrix[a, b + 2] == '\u2588')
+                                {
+                                    Matrix[a, b] = '\u2588';
+                                }
+                            }                             
+                        }
+                    }
+                }
+
+                Console.Write(".");
+                ReRun++;
+            }  
+        }
+
+        static void CharacterSelection()
+        {
+            Console.WriteLine("WELCOME PLAYER");
+            Console.WriteLine("Please Choose A Character");
+            Console.WriteLine("Each charcter presents a different set of skills to help you navigate the dungeon. Choose wisely as your choice will dictate how you progress");
+            Console.WriteLine();
+            Console.WriteLine("THE BRUTE");
+            Console.WriteLine("Stronger Attacks; deal more damage than the enemy per-swing. However, is slower wehn trying to escape");
+
+            Console.WriteLine("Make Your Selection");
+            string input = Console.ReadLine();
+            if (input == "Brute")
+            {
+                Character = 1;
+                Character brute = new Character
+                {
+                    charisma = 0,
+                    damage = 25,
+                    health = 150,
+                    speed = 1
+                };
+                Console.WriteLine("Please Enter Your Characters Name");
+                brute.name = Console.ReadLine();
+                Console.Clear();
+                Console.WriteLine(" You, "+ brute.name + ", have dedicated your life to training. Your sword and anger rival many worriors and although your not fast and able to dodge your still a brave fighter.");
+                Console.WriteLine("Press Enter To Continue");
+                Console.ReadKey();
+            }
+            if (input == "Coward")
+            {
+                Character coward = new Character
+                {
+                    charisma = 0,
+                    damage = 25,
+                    health = 150,
+                    speed = 1
+                };
+                Console.WriteLine("Please Enter Your Characters Name");
+                coward.name = Console.ReadLine();
+            }
+            if (input == "Trickster")
+            {
+                Character trickster = new Character
+                {
+                    charisma = 0,
+                    damage = 25,
+                    health = 150,
+                    speed = 1
+                };
+                Console.WriteLine("Please Enter Your Characters Name");
+                trickster.name = Console.ReadLine();
+            } 
+            if (input == "Ninja")
+            {
+                Character ninja = new Character
+                {
+                    charisma = 0,
+                    damage = 25,
+                    health = 150,
+                    speed = 1
+                };
+                Console.WriteLine("Please Enter Your Characters Name");
+                ninja.name = Console.ReadLine();
+            }
+            else
+            {
+
+            }
         }
     }
 }
