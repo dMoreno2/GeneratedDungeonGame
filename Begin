@@ -163,6 +163,7 @@ namespace DungeonCrawller
 
         public static Character MainCharacter = new Character();
         public static List<Character> Enemies = new List<Character>();
+        public static List<KeyValuePair<int, int>> enemyPos = new List<KeyValuePair<int, int>>();
 
 
         static void Main(string[] args)
@@ -208,6 +209,7 @@ namespace DungeonCrawller
                 if (input == "Restart" || input == "restart")
                 {
                     done = false;
+                    playing = false;
                     Walls.Clear();
                     goto start;
                 }
@@ -537,6 +539,7 @@ namespace DungeonCrawller
                                     enemyNumb--;
                                     YesOrNo = 1;
                                     rows--;
+                                    enemyPos.Add(new KeyValuePair<int, int>(a, b));
                                 }
                             }
                             if (Matrix[a, b] == '\u2588' && Matrix[a, b + 1] == '\u2588' && Matrix[a, b + 2] == '\u2588')
@@ -625,6 +628,12 @@ namespace DungeonCrawller
                         Matrix[playerX, playerY] = '☻';
                         break;
                     }
+                    if (Matrix[playerX, playerY + 1] == '⌂')
+                    {
+                        Matrix[playerOldx, playerOldy] = '\u2588';
+                        playerY++;
+                        Matrix[playerX, playerY] = '☻';
+                    }
                     else if (Matrix[playerX, playerY + 1] != '\u2588')
                     {
                         Matrix[playerX, playerY] = '☻';
@@ -638,6 +647,13 @@ namespace DungeonCrawller
                 while (playerX - 1 > 0)
                 {
                     if (Matrix[playerX - 1, playerY] == '\u2588')
+                    {
+                        Matrix[playerOldx, playerOldy] = '\u2588';
+                        playerX--;
+                        Matrix[playerX, playerY] = '☻';
+                        break;
+                    }
+                    if (Matrix[playerX - 1, playerY] == '⌂')
                     {
                         Matrix[playerOldx, playerOldy] = '\u2588';
                         playerX--;
@@ -663,6 +679,13 @@ namespace DungeonCrawller
                         Matrix[playerX, playerY] = '☻';
                         break;
                     }
+                    if (Matrix[playerX, playerY - 1] == '⌂')
+                    {
+                        Matrix[playerOldx, playerOldy] = '\u2588';
+                        playerY--;
+                        Matrix[playerX, playerY] = '☻';
+                        break;
+                    }
                     else if (Matrix[playerX, playerY - 1] != '\u2588')
                     {
                         Matrix[playerX, playerY] = '☻';
@@ -682,6 +705,13 @@ namespace DungeonCrawller
                         Matrix[playerX, playerY] = '☻';
                         break;
                     }
+                    if (Matrix[playerX + 1, playerY] == '⌂')
+                    {
+                        Matrix[playerOldx, playerOldy] = '\u2588';
+                        playerX++;
+                        Matrix[playerX, playerY] = '☻';
+                        break;
+                    }
                     else if(Matrix[playerX + 1, playerY] != '\u2588')
                     {
                         Matrix[playerX, playerY] = '☻';
@@ -689,6 +719,10 @@ namespace DungeonCrawller
                     }
                     break;
                 }
+            }
+            foreach (KeyValuePair<int, int> item in enemyPos)
+            {
+
             }
         } 
 
